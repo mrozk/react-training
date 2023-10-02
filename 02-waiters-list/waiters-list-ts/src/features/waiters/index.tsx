@@ -6,6 +6,7 @@ import {WaiterList} from "./WaiterList";
 
 export function WaitersApp() {
     const [list, setList] = React.useState<Waiter[]>([])
+    const [editingWaiter, setEditingWaiter] = React.useState<Waiter | null>(null);
 
     useEffect(() => {
         WaitersApi.getList().then((waitersList) => {
@@ -14,17 +15,30 @@ export function WaitersApp() {
         })
     }, [])
 
-    const onWaitersSubmit = (waiter: Waiter) => {
-        WaitersApi.create(waiter).then((newWaiter) => {
-            setList([...list, newWaiter])
+    const deleteWaiter = (id: number) => {
+        WaitersApi.delete(id).then(() => {
+            setList(list.filter((todo) => todo.id !== id))
         })
+    }
+
+    const onWaitersSubmit = (waiter: Waiter) => {
+        if(waiter.id) {
+            WaitersApi.update(waiter.id, waiter).then((updatedWaiter) => {
+                setEditingWaiter(null)
+                setList(list.map((waiter) => waiter.id === updatedWaiter.id ? updatedWaiter : waiter))
+            })
+        } else {
+            WaitersApi.create(waiter).then((newWaiter) => {
+                setList([...list, newWaiter])
+            })
+        }
     }
 
     return (
         <div>
             <h1>Waiters list</h1>
-            <WaiterList list={list}/>
-            <FormEdit onTodoSubmit={onWaitersSubmit} />
+            <WaiterList editWaiter={setEditingWaiter} deleteWaiter={deleteWaiter} list={list}/>
+            <FormEdit onTodoSubmit={onWaitersSubmit} editingWaiter={editingWaiter} />
 
         </div>
     );
