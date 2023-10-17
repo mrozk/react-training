@@ -1,30 +1,23 @@
 import React, {useEffect} from "react";
-import {Waiter} from "./type";
-import {WaitersApi} from "./api/WaitersApi";
 import {FormEdit} from "./FormEdit";
 import {WaiterList} from "./WaiterList";
+import {useDispatch, useSelector} from "react-redux";
+import {getList} from "./store/thunk";
 
 export function WaitersApp() {
-    const [list, setList] = React.useState<Waiter[]>([])
+    const list = useSelector((state: any) => state.waiter.list)
 
+    const dispatch = useDispatch()
     useEffect(() => {
-        WaitersApi.getList().then((waitersList) => {
-            console.log(waitersList)
-            setList(waitersList)
-        })
-    }, [])
-
-    const onWaitersSubmit = (waiter: Waiter) => {
-        WaitersApi.create(waiter).then((newWaiter) => {
-            setList([...list, newWaiter])
-        })
-    }
+        // @ts-ignore
+        dispatch(getList())
+    }, [getList])
 
     return (
         <div>
             <h1>Waiters list</h1>
             <WaiterList list={list}/>
-            <FormEdit onTodoSubmit={onWaitersSubmit} />
+            <FormEdit />
 
         </div>
     );

@@ -1,45 +1,44 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Waiter} from "./type";
+import {useDispatch, useSelector} from "react-redux";
+import {saveItem} from "./store/thunk";
 
-interface FormEditProps {
-    onTodoSubmit: (waiter: Waiter) => void;
-}
+export function FormEdit() {
+    const dispatch = useDispatch()
+    const waiter = useSelector((state: any) => state.waiter.editingWaiter)
+    const [firstName, setFirstName] = useState(waiter.firstName)
+    const [phone, setPhone] = useState(waiter.phone)
 
-export function FormEdit({ onTodoSubmit }: FormEditProps) {
-    // const [firstName, setTitle] = useState('')
-    // const [done, setDone] = useState(false)
-    const [firstName, setFirstName] = useState('');
-    const [phone, setPhone] = useState('');
+    useEffect(() => {
+        setFirstName(waiter.firstName)
+        setPhone(waiter.phone)
+    }, [waiter])
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (firstName && phone) {
-            onTodoSubmit({
-                firstName: firstName,
-                phone: phone
-            })
-            setFirstName('');
-            setPhone('');
-        }
-        //
-        // onTodoSubmit({
-        //     firstName,
-        // })
 
-        // setTitle('')
-        // setDone(false)
+            const newWaiter = {
+                ...waiter,
+                firstName,
+                phone,
+            }
+
+            // @ts-ignore
+            dispatch(saveItem(newWaiter))
+        }
     }
 
     return (
         <form onSubmit={handleSubmit}>
             <div>
-                <label htmlFor="title">Title</label>
+                <label htmlFor="title">First name</label>
                 <input value={firstName} type="text" id="firstName" onChange={e => setFirstName(e.target.value) }/>
             </div>
 
             <div>
                 <label htmlFor="phone">Phone</label>
-                <input value={phone} type="text" id="phone" onChange={e => setPhone(e.target.value)}/>
+                <input value={phone} type="text" id="phone" onChange={e => setPhone(e.target.value)} />
             </div>
 
             <button type="submit">Submit</button>
