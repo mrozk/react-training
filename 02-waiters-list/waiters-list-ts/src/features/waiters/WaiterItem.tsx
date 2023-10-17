@@ -1,23 +1,24 @@
 import {Waiter} from "./type";
+import {useDispatch} from "react-redux";
+import {removeItem, saveItem} from "./store/thunk";
+import {setEditingItemAction} from "./store/actions";
 
 interface TodoItemProps {
   waiter: Waiter,
-  deleteWaiter: (id: number) => void;
-  editWaiter: (waiter: Waiter) => void;
 }
 
-export function WaiterItem({waiter, deleteWaiter, editWaiter}: TodoItemProps) {
+export function WaiterItem({waiter}: TodoItemProps) {
+    const dispatch = useDispatch()
 
-    // function onEditBtnClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    //     editWaiter(waiter)
-    // }
+    function onEditBtnClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        // @ts-ignore
+        dispatch(setEditingItemAction(waiter))
+    }
 
     function onDeleteBtnClick(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        console.log(event)
-        console.log(waiter.id)
-
         if (waiter.id) {
-            deleteWaiter(waiter.id)
+            // @ts-ignore
+            dispatch(removeItem(waiter.id))
         }
     }
 
@@ -27,7 +28,7 @@ export function WaiterItem({waiter, deleteWaiter, editWaiter}: TodoItemProps) {
             <td>{waiter.firstName}</td>
             <td>{waiter.phone}</td>
             <td>
-                <button onClick={() => editWaiter(waiter)}>Edit</button>
+                <button onClick={onEditBtnClick}>Edit</button>
                 <button onClick={onDeleteBtnClick}>Delete</button>
             </td>
         </tr>

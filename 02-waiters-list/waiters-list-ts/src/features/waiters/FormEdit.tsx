@@ -1,30 +1,31 @@
 import React, {useEffect, useState} from "react";
 import {Waiter} from "./type";
+import {useDispatch, useSelector} from "react-redux";
+import {saveItem} from "./store/thunk";
 
-interface FormEditProps {
-    onTodoSubmit: (waiter: Waiter) => void,
-    editingWaiter: Waiter | null
-}
-
-export function FormEdit({ onTodoSubmit, editingWaiter }: FormEditProps) {
-    const [firstName, setFirstName] = useState(editingWaiter ? editingWaiter.firstName : '');
-    const [phone, setPhone] = useState(editingWaiter ? editingWaiter.phone : '');
+export function FormEdit() {
+    const dispatch = useDispatch()
+    const waiter = useSelector((state: any) => state.waiter.editingWaiter)
+    const [firstName, setFirstName] = useState(waiter.firstName)
+    const [phone, setPhone] = useState(waiter.phone)
 
     useEffect(() => {
-        setFirstName(editingWaiter ? editingWaiter.firstName : '')
-        setPhone(editingWaiter ? editingWaiter.phone : '')
-    }, [editingWaiter])
+        setFirstName(waiter.firstName)
+        setPhone(waiter.phone)
+    }, [waiter])
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (firstName && phone) {
-            onTodoSubmit({
-                id: editingWaiter ? editingWaiter.id : undefined,
-                firstName: firstName,
-                phone: phone
-            })
-            setFirstName('');
-            setPhone('');
+
+            const newWaiter = {
+                ...waiter,
+                firstName,
+                phone,
+            }
+
+            // @ts-ignore
+            dispatch(saveItem(newWaiter))
         }
     }
 
@@ -37,7 +38,7 @@ export function FormEdit({ onTodoSubmit, editingWaiter }: FormEditProps) {
 
             <div>
                 <label htmlFor="phone">Phone</label>
-                <input value={phone} type="text" id="phone" onChange={e => setPhone(e.target.value)}/>
+                <input value={phone} type="text" id="phone" onChange={e => setPhone(e.target.value)} />
             </div>
 
             <button type="submit">Submit</button>
