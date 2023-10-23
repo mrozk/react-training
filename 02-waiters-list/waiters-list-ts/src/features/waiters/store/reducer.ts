@@ -5,7 +5,7 @@ import {
   ACTION_WAITER_UPDATE_ITEM,
   ACTION_WAITER_GET_LIST_SUCCESS,
   ACTION_WAITER_GET_LIST_LOADING,
-  ACTION_WAITER_GET_LIST_ERROR,
+  ACTION_WAITER_GET_LIST_ERROR, ACTION_WAITER_SAVE_WAITER_ERROR,
 } from './actions'
 import {Waiter} from "../type";
 
@@ -18,6 +18,7 @@ interface INITIAL_STATE_I {
   list: Waiter[],
   listLoading: boolean,
   listError?: Error,
+  saveError?: Error,
 }
 
 const INITIAL_STATE: INITIAL_STATE_I = {
@@ -25,6 +26,7 @@ const INITIAL_STATE: INITIAL_STATE_I = {
   list: [],
   listLoading: false,
   listError: undefined,
+  saveError: undefined,
 }
 
 export const reducer = (state = INITIAL_STATE, { type, payload }: any) => {
@@ -35,11 +37,14 @@ export const reducer = (state = INITIAL_STATE, { type, payload }: any) => {
       return {...state, list: payload, listLoading: false}
     case ACTION_WAITER_GET_LIST_ERROR:
       return {...state, list: [], listError: payload, listLoading: false}
+    case ACTION_WAITER_SAVE_WAITER_ERROR:
+      return {...state, list: [], saveError: payload, listLoading: false}
     case ACTION_WAITER_CREATE_ITEM:
       return {
         ...state,
         list: [...state.list, payload],
         editingWaiter: { ...DEFAULT_WAITER },
+        saveError: undefined,
       }
     case ACTION_WAITER_REMOVE_ITEM:
       return {...state, list: state.list.filter((waiter: Waiter) => waiter.id !== payload)}
@@ -50,6 +55,7 @@ export const reducer = (state = INITIAL_STATE, { type, payload }: any) => {
         ...state,
         list: state.list.map((todo: Waiter) => todo.id === payload.id ? payload : todo),
         editingWaiter: DEFAULT_WAITER,
+        saveError: undefined,
       }
     default:
       return state
