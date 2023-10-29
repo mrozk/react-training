@@ -1,24 +1,16 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {FormEdit} from "./FormEdit";
 import {WaiterList} from "./WaiterList";
-import {useDispatch, useSelector} from "react-redux";
-import {getList} from "./store/thunk";
+import {Route, Routes} from "react-router-dom";
+import {NotFound} from "../NotFound";
 
 export function WaitersApp() {
-    const list = useSelector((state: any) => state.waiter.list)
-
-    const dispatch = useDispatch()
-    useEffect(() => {
-        // @ts-ignore
-        dispatch(getList())
-    }, [getList])
-
     return (
-        <div>
-            <h1>Waiters list</h1>
-            <WaiterList list={list}/>
-            <FormEdit />
-
-        </div>
+        <Routes>
+            <Route path="/" element={<WaiterList />} />
+            <Route path="/create" element={<FormEdit />} />
+            <Route path="/edit/:id" element={<FormEdit />} />
+            <Route path="*" element={<NotFound />} />
+        </Routes>
     );
 }
