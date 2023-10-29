@@ -34,6 +34,14 @@ export class FetchClient<T> {
     }
   }
 
+  async getOne(id: number): Promise<T> {
+    try {
+      return await this.request<T>(String(id))
+    } catch (e: any) {
+      throw Error(`Can't fetch one item from server: ${e.message}`)
+    }
+  }
+
   async create(data: T): Promise<T> {
     try {
       return await this.request<T>('', 'POST', data)

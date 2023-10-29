@@ -1,8 +1,9 @@
 import {Waiter} from "./type";
 import {useDispatch} from "react-redux";
-import {removeItem, saveItem} from "./store/thunk";
+import {removeItem} from "./store/thunk";
 import {setEditingItemAction} from "./store/actions";
 import React from "react";
+import {Link} from "react-router-dom";
 
 interface TodoItemProps {
   waiter: Waiter,
@@ -40,7 +41,7 @@ export function WaiterItem({waiter}: TodoItemProps) {
             <td>{waiter.firstName}</td>
             <td>{waiter.phone}</td>
             <td>
-                <button onClick={onEditBtnClick} disabled={loading}>Edit</button>
+                <Link to={`/waiters/edit/${waiter.id}`}><button onClick={onEditBtnClick} disabled={loading}>Edit</button></Link>
                 <button onClick={onDeleteBtnClick} disabled={loading}>Delete</button>
                 {error && <span style={{ color: 'red' }}>{error}</span>}
             </td>

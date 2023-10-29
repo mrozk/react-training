@@ -1,37 +1,49 @@
 import {Waiter} from "./type";
 import {WaiterItem} from "./WaiterItem";
-import React from "react";
-import {useSelector} from "react-redux";
+import React, {useEffect} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {Link} from "react-router-dom";
+import {Page} from "../../components/Page";
+import {getList} from "./store/thunk";
 
-interface TodoListProps {
-  list: Waiter[],
-}
+export function WaiterList(): React.ReactElement {
+    const list: Waiter[] = useSelector((state: any) => state.waiter.list || [])
 
-export function WaiterList({ list }: TodoListProps): React.ReactElement {
-  const loading = useSelector((state: any) => state.waiter.listLoading)
-  const error = useSelector((state: any) => state.waiter.listError)
+    const loading = useSelector((state: any) => state.waiter.listLoading)
+    const error = useSelector((state: any) => state.waiter.listError)
+    const dispatch = useDispatch()
 
-  if (loading) {
-     return <div>Loading...</div>
-  }
+    useEffect(() => {
+        // @ts-ignore
+        dispatch(getList())
+    }, [getList])
 
-  if (error) {
-     return <div style={{ color: 'red'}}>{error.message}</div>
-  }
-
-  return (
-    <table>
-      <thead>
-        <tr>
-          <th>Id</th>
-          <th>Title</th>
-          <th>Phone</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {list.map((waiter) => <WaiterItem waiter={waiter} key={waiter.id} />)}
-      </tbody>
-    </table>
-  );
+    return (
+        <Page
+            title='Waiters List'
+            loading={loading}
+            error={error}
+        >
+            <div>
+                <div>
+                    <Link to="/waiters/create">
+                        <button>Create</button>
+                    </Link>
+                </div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Title</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {list.map((waiter) => <WaiterItem waiter={waiter} key={waiter.id}/>)}
+                    </tbody>
+                </table>
+            </div>
+        </Page>
+    );
 }

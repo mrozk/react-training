@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from "react";
-import {Waiter} from "./type";
 import {useDispatch, useSelector} from "react-redux";
 import {saveItem} from "./store/thunk";
+import {useNavigate} from "react-router-dom";
+import {Page} from "../../components/Page";
 
 export function FormEdit() {
     const dispatch = useDispatch()
     const waiter = useSelector((state: any) => state.waiter.editingWaiter)
+    const navigate = useNavigate();
     const saveError = useSelector((state: any) => state.waiter.saveError)
     const [firstName, setFirstName] = useState(waiter.firstName)
     const [phone, setPhone] = useState(waiter.phone)
@@ -33,6 +35,7 @@ export function FormEdit() {
             try {
                 // @ts-ignore
                 await dispatch(saveItem(newWaiter))
+                navigate("/waiters");
             } catch (e: any) {
                 setError(e.message)
             } finally {
@@ -43,7 +46,11 @@ export function FormEdit() {
     }
 
     return (
-        <>
+        <Page
+            title='Edit waiters'
+            loading={loading}
+            error={error}
+        >
             <form onSubmit={handleSubmit}>
                 {saveError ? <div style={{color: 'red'}}>Unable to save data</div> : null}
                 <div>
@@ -59,6 +66,6 @@ export function FormEdit() {
                 <button disabled={loading} type="submit">Submit</button>
             </form>
             {error && <div style={{color: 'red'}}>{error}</div>}
-        </>
+        </Page>
     )
 }
