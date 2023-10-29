@@ -1,6 +1,6 @@
 import {
   getListActionSuccess,
-  getListActionError, removeItemAction, createItemAction, updateItemAction, getListActionLoading,
+  getListActionError, removeItemAction, createItemAction, updateItemAction, getListActionLoading, getSaveActionError,
 } from "./actions";
 import {WaitersApi} from "../api/WaitersApi";
 import {Waiter} from "../type";
@@ -21,25 +21,21 @@ export function getList() {
 }
 
 export function removeItem(id: number) {
-  return (dispatch: any) => {
-    WaitersApi.delete(id).then(() => {
-      dispatch(removeItemAction(id))
-    })
+  return async (dispatch: any) => {
+    await WaitersApi.delete(id)
+    dispatch(removeItemAction(id))
   }
 }
 //
 export function saveItem(waiter: Waiter) {
-  return (dispatch: any) => {
+  return async (dispatch: any) => {
     if (waiter.id) {
-      WaitersApi.update(waiter.id, waiter).then((updatedTodo) => {
-        dispatch(updateItemAction(updatedTodo))
-      })
+      const updatedTodo = await WaitersApi.update(waiter.id, waiter)
+
+      dispatch(updateItemAction(updatedTodo))
     } else {
-      WaitersApi.create(waiter).then((newTodo) => {
-        dispatch(createItemAction(newTodo))
-      })
+      const waiterPromise = await WaitersApi.create(waiter);
+      dispatch(createItemAction(waiterPromise))
     }
   }
 }
-
-// dispatch(getList()) -> f -> thunk -> f(dispatch, getState) -> dispatch({}) -> {} -> reducer -> state

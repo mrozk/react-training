@@ -6,15 +6,18 @@ import {saveItem} from "./store/thunk";
 export function FormEdit() {
     const dispatch = useDispatch()
     const waiter = useSelector((state: any) => state.waiter.editingWaiter)
+    const saveError = useSelector((state: any) => state.waiter.saveError)
     const [firstName, setFirstName] = useState(waiter.firstName)
     const [phone, setPhone] = useState(waiter.phone)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
 
     useEffect(() => {
         setFirstName(waiter.firstName)
         setPhone(waiter.phone)
     }, [waiter])
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (firstName && phone) {
 
@@ -24,24 +27,38 @@ export function FormEdit() {
                 phone,
             }
 
-            // @ts-ignore
-            dispatch(saveItem(newWaiter))
+            setError('')
+            setLoading(true)
+
+            try {
+                // @ts-ignore
+                await dispatch(saveItem(newWaiter))
+            } catch (e: any) {
+                setError(e.message)
+            } finally {
+                setLoading(false)
+            }
+
         }
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div>
-                <label htmlFor="title">First name</label>
-                <input value={firstName} type="text" id="firstName" onChange={e => setFirstName(e.target.value) }/>
-            </div>
+        <>
+            <form onSubmit={handleSubmit}>
+                {saveError ? <div style={{color: 'red'}}>Unable to save data</div> : null}
+                <div>
+                    <label htmlFor="title">First name</label>
+                    <input value={firstName} type="text" id="firstName" onChange={e => setFirstName(e.target.value)}/>
+                </div>
 
-            <div>
-                <label htmlFor="phone">Phone</label>
-                <input value={phone} type="text" id="phone" onChange={e => setPhone(e.target.value)} />
-            </div>
+                <div>
+                    <label htmlFor="phone">Phone</label>
+                    <input value={phone} type="text" id="phone" onChange={e => setPhone(e.target.value)}/>
+                </div>
 
-            <button type="submit">Submit</button>
-        </form>
+                <button disabled={loading} type="submit">Submit</button>
+            </form>
+            {error && <div style={{color: 'red'}}>{error}</div>}
+        </>
     )
 }
